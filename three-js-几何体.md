@@ -1,8 +1,12 @@
+---
+title: three.js-几何体
+date: 2016-12-07 21:43:13
+tags: three.js
+---
 
 
 
-
-## 基础几何体
+**基础几何体**
 
 `THREE.Geometry()	//几何体基类`
 
@@ -14,7 +18,7 @@
 
 
 
-## 更加自由的几何体
+**更加自由的几何体**
 
 `THREE.BufferGeometry()    //带有缓存区的几何体，自由度最高的geometry类型`
 

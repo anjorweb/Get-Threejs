@@ -1,6 +1,16 @@
+---
+title: three.js-动画基础
+date: 2016-12-07 21:41:50
+tags: three.js
+---
+
+
+
 每个3D场景内的物体动画都由基本的旋转、移动、缩放构成。
 
-## 旋转
+
+
+### 旋转
 
 更新Mesh的rotation属性，rotation属性是一个欧拉类型的THREE.Euler();
 
@@ -34,7 +44,7 @@ console.dir(Mesh.rotation) //Euler
 
 
 
-## 移动
+### 移动
 
 Mesh.position 是一个3维向量，THREE.Vector3();
 
@@ -54,7 +64,7 @@ console.dir(Mesh.position);		//Vector3;
 
 
 
-## 缩放
+### 缩放
 
 Mesh.scale 还是一个三维向量 THREE.Vector3();
 

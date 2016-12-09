@@ -1,0 +1,137 @@
+---
+title: three.js-材质
+date: 2016-12-07 21:40:39
+tags: three.js
+---
+
+
+
+### 一些材质
+
+`MeshBasicMaterial` 是一种非常简单的材质，这种材质不考虑光照的影响。
+
+`MeshLambertMaterial ` 用于暗淡，不发光物体，这种材质对光照有反应
+
+`MeshPhongMaterial` 用于光亮表面物体的材质，特点是会产生高光，比如一个球的表面在光线下特别亮，这种材质对光照也有反应
+
+`PointsMeterial` 用于给粒子系统设置材质，对光照没有反应
+
+`LineBasicMaterial` 用于绘制线框的样式的材质，这种材质不考虑光照的影响
+
+`MeshNormalMaterial` 将法线向量映射到RGB颜色的材质，只支持以THREE.FlatShading 模式来渲染Mesh
+
+`MeshFaceMaterial` 面材质，就是一个材质数组，仅有一个成员数组materials，用来存放一组材质，这组材质会被geometry不同面所使用，所以可以做到同一个物体，不同面使用不同材质，每一面使用什么材质由geometry中的索引决定
+
+
+
+**材质的一些属性：**
+
+声明，只是列举一些属性，并不是适应于任何材质类型
+
+```javascript
+{
+    side: THREE.DoubleSide,  //双面绘制
+}
+```
+
+
+
+### MeshBasicMaterial
+
+Three.js中最基本的材质，这个材质可以将Mesh渲染成线框模式或者平面模式，平面模式指表面的渲染比较平整。
+
+没有光源情况下，呈现材质定义的颜色
+
+```
+new THREE.MeshBasicMaterial({});
+```
+
+**一些属性**
+
+```javascript
+wireframe: true //以网格方式显示
+map: texture //可以用纹理材质，图片
+vertexColors: THREE.FaceColors,	//几何体的每个顶点使用faces[i].color颜色，需要设置geometry.faces[i].color.setHex(hex)
+color //材质颜色
+transparent: true|false  //是否透明，材质的每一个像素点由RGBA表示，只有当transparent为true的时候，A分量才起作用
+shading: //着色方式 
+blending: //混合方式 
+```
+
+**混合方式**
+
+THREE.NoBlending 没有混合 
+
+ THREE.MultiplyBlending 相乘混合 
+
+ THREE.NormalBlending 普通 
+
+ THREE.AdditiveBlending 相加 
+
+ THREE.SubtractiveBlending 相减 
+
+ THREE.CustomBlending 自定义
+
+*transparent 为true的时候，blending才生效*
+
+**着色方式**
+
+`THREE.SmoothShading` 平滑着色
+
+`THREE.NoShading` 不着色
+
+`THREE.FlatShading` 平面着色是最简单也是最快速的着色方法，每个多边形都会被指定一个单一且没有变化的颜色。这种方法虽然会产生出不真实
+
+
+
+这里要说下为什么一个立方体faces.length 是12，因为threejs中任何平面都是由三角形构成，所以一个立方体面=三角形*2，那么6个面就是12个三角形了，所以faces.length为12
+
+### MeshLambertMaterial
+
+兰伯特材质，会向各个方向均匀的反射光线，如白纸
+
+```
+new THREE.MeshLambertMaterial( { color: 0x666666, emissive: 0xff0000, shading: THREE.FlatShading })
+```
+
+emissive   自发光
+
+shading  着色方式
+
+
+
+### MeshPhongMaterial
+
+```
+new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0xff0000, shininess: 30, shading: THREE.SmoothShading, opacity:0.9, transparent:true } )
+new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0xff0000, shininess: 30, shading: THREE.FlatShading, map:texture, transparent:true } //透明了，带一个纹理
+```
+
+
+
+### PointsMaterial
+
+点材质，用于给Points粒子系统添加材质。
+
+**例如：**
+
+```
+var mat = new THREE.PointsMaterial({size:1});  //粒子的材质，size设置大小
+var geometry = new THREE.Geometry();    // 创建一个几何体
+var points = new THREE.Points(geometry, mat);  //创建一个粒子系统
+```
+
+
+
+### 绘制网格，有利于测试
+
+`new THREE.GridHelper(size, step, hex, hex);`
+
+size：网格边长，step 分成多少份
+
+例如：`new THREE.GridHelper(1000, 50, 0xff0000, 0x808080);`
+
+
+
+
+
