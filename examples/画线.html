@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>THREE.Line</title>
+    <script src="build/three.js"></script>
+</head>
+<body>
+
+<script>
+    var scene = new THREE.Scene();
+
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+
+    var renderer = new THREE.WebGLRenderer({
+        antialias:true
+    });
+    renderer.setClearColor(0xffffff);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+
+    //画线
+    var geometry = new THREE.Geometry();
+
+    //定义顶点
+    var p1 = new THREE.Vector3(-100, 0, 0);
+    var p2 = new THREE.Vector3(100, 0, 0);
+    var p3 = new THREE.Vector3(0, -100, 0);
+    var p4 = new THREE.Vector3(-100, -50, 0);
+
+    var color1 = new THREE.Color(0xff0000),
+        color2 = new THREE.Color(0x00ff00),
+        color3 = new THREE.Color(0x00ffff);
+    function getColor(){
+        return '#'+('00000'+(Math.random()*0x1000000<<0).toString(16)).slice(-6);
+    }
+    for( var i=0; i<300; i++){
+        var rd1 = parseInt(1000*Math.random()-500);
+        var rd2 = parseInt(1000*Math.random()-500);
+        var rd3 = parseInt(1000*Math.random()-500);
+        geometry.vertices.push(new THREE.Vector3(rd1, rd2, rd3));
+        geometry.colors.push(new THREE.Color(getColor()));
+    }
+    //geometry.colors.push(color1, color2, color3, color3);
+
+    var lineMetarial = new THREE.LineBasicMaterial({ vertexColors: THREE.VertexColors});
+    var line = new THREE.LineSegments(geometry, lineMetarial);   //new THREE.Line();
+    scene.add(line);
+
+    camera.position.z = 1000;
+
+    function render(){
+        scene.rotation.x+=0.02;
+        scene.rotation.y+=0.02;
+        requestAnimationFrame(render);
+        renderer.render(scene, camera);
+    }
+    render();
+</script>
+</body>
+</html>

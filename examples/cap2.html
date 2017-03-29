@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>第二课</title>
+    <script src="build/three.js"></script>
+    <style>
+        * { margin:0; padding:0; }
+    </style>
+</head>
+<body>
+<script>
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+
+    var renderer = new THREE.WebGLRenderer({
+        antialias:true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000);
+
+    var scene = new THREE.Scene();
+
+    document.body.appendChild(renderer.domElement);
+
+    var cubeMeo = new THREE.CubeGeometry(2, 2, 2);
+    var cubeMaterial = new THREE.MeshBasicMaterial({ color:0xff0000, wireframe :true});
+    var cube = new THREE.Mesh(cubeMeo, cubeMaterial);
+    scene.add(cube);
+    console.dir(scene);
+
+    camera.position.z = 5;
+
+    function render(){
+        requestAnimationFrame(render);
+        cube.rotation.y += .03;
+        //cube.rotation.x += .03;
+        //cube.rotation.z -= .03;
+        renderer.render(scene, camera);
+    }
+    render();
+
+</script>
+</body>
+</html>
