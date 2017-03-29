@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>第7课 相机</title>
+    <script src="build/three.js"></script>
+    <script src="js/stats.min.js"></script>
+    <style>
+        * { margin:0; padding:0; }
+    </style>
+</head>
+<body>
+<script>
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+
+    var renderer = new THREE.WebGLRenderer({
+        antialias:true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000);
+
+    var scene = new THREE.Scene();
+
+    document.body.appendChild(renderer.domElement);
+
+    var cubeMeo = new THREE.CubeGeometry(20, 20, 20);
+    var cubeMaterial = new THREE.MeshBasicMaterial({ color:0xff0000, wireframe :true});
+    var cube = new THREE.Mesh(cubeMeo, cubeMaterial);
+    scene.add(cube);
+
+    var cubeMeo2 = new THREE.CubeGeometry(20, 20, 20);
+    var cubeMaterial2 = new THREE.MeshBasicMaterial({ color:0x00ff00});
+    var cube2 = new THREE.Mesh(cubeMeo2, cubeMaterial2);
+    cube2.position.x = 30;
+    scene.add(cube2);
+
+
+
+    //axishelper
+    var axis = new THREE.AxisHelper(100);
+    scene.add(axis);
+
+    var stats = new Stats();
+    stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+    document.body.appendChild( stats.dom );
+
+    camera.position.z = 200;
+    camera.position.y = 100;
+   // camera.lookAt(new THREE.Vector3(0,0,0));
+    camera.lookAt(cube2.position);
+    camera.up.x = -1;
+    camera.up.y = 0;
+    camera.up.z = 0;
+
+
+    function render(){
+        stats.begin();
+
+        //cube.rotation.x += .03;
+        //cube.rotation.z -= .03;
+        renderer.render(scene, camera);
+        stats.end();
+
+        requestAnimationFrame(render);
+    }
+    render();
+
+</script>
+</body>
+</html>

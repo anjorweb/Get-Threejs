@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>第6课 让场景动起来</title>
+    <script src="build/three.js"></script>
+    <script src="js/stats.min.js"></script>
+    <script src="js/Tween.js"></script>
+    <style>
+        * { margin:0; padding:0; }
+    </style>
+</head>
+<body>
+<script>
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+
+    var renderer = new THREE.WebGLRenderer({
+        antialias:true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000);
+
+    var scene = new THREE.Scene();
+
+    document.body.appendChild(renderer.domElement);
+
+    var cubeMeo = new THREE.CubeGeometry(2, 2, 2);
+    var cubeMaterial = new THREE.MeshBasicMaterial({ color:0xff0000, wireframe :true});
+    var cube = new THREE.Mesh(cubeMeo, cubeMaterial);
+    scene.add(cube);
+
+    camera.position.z = 5;
+
+    console.dir(camera);
+
+    var stats = new Stats();
+    stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+    document.body.appendChild( stats.dom );
+
+    //Tween.js
+    new TWEEN.Tween(cube.rotation).to({y:Math.PI*2}, 1000).easing(TWEEN.Easing.Quadratic.In).repeat(Infinity).start();
+
+    function render(){
+        stats.begin();
+
+        //cube.rotation.x += .03;
+        //cube.rotation.z -= .03;
+        renderer.render(scene, camera);
+        TWEEN.update();
+        stats.end();
+
+        requestAnimationFrame(render);
+    }
+    render();
+
+</script>
+</body>
+</html>
