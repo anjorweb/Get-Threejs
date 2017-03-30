@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>第二课</title>
+    <title>第8课</title>
     <script src="build/three.js"></script>
+    <script src="js/dat.gui.js"></script>
     <style>
         * { margin:0; padding:0; }
         html, body { height:100%; width:100%; overflow:hidden; }
@@ -11,7 +12,16 @@
 </head>
 <body>
 <script>
+
+/*    var box = $("#box");
+    $("body").append('<div id="box"></div>');
+    if(box)*/
+
+    //camera
     var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+    //var camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth/2, window.innerHeight/2, window.innerHeight/-2, 1, 1000);
+    camera.position.y = 200;
+    camera.position.z = 500;
 
     var renderer = new THREE.WebGLRenderer({
         antialias:true
@@ -23,17 +33,30 @@
 
     document.body.appendChild(renderer.domElement);
 
-    var cubeMeo = new THREE.CubeGeometry(2, 2, 2);
+    var cubeMeo = new THREE.CubeGeometry(200, 200, 200);
     var cubeMaterial = new THREE.MeshBasicMaterial({ color:0xff0000, wireframe :true});
     var cube = new THREE.Mesh(cubeMeo, cubeMaterial);
     scene.add(cube);
-    console.dir(scene);
+    camera.lookAt(cube.position);
 
-    camera.position.z = 5;
+    //dat.gui
+    var parm;
+    function ParmObj(){
+        this.fov = 45;
+    }
+    parm = new ParmObj();
+    var gui = new dat.GUI();
+    gui.add(parm, "fov", 0, 180).name("视角大小");
+
+    function setCameraFov(){
+        camera.fov = parm.fov;
+        camera.updateProjectionMatrix();
+    }
 
     function render(){
         requestAnimationFrame(render);
         cube.rotation.y += .03;
+        setCameraFov();
         //cube.rotation.x += .03;
         //cube.rotation.z -= .03;
         renderer.render(scene, camera);

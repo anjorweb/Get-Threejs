@@ -23,47 +23,52 @@
 
     document.body.appendChild(renderer.domElement);
 
+    var group = new THREE.Object3D();
+    scene.add(group);
+
     var cubeMeo = new THREE.CubeGeometry(20, 20, 20);
     var cubeMaterial = new THREE.MeshBasicMaterial({ color:0xff0000, wireframe :true});
     var cube = new THREE.Mesh(cubeMeo, cubeMaterial);
-    scene.add(cube);
+    group.add(cube);
 
     var cubeMeo2 = new THREE.CubeGeometry(20, 20, 20);
-    var cubeMaterial2 = new THREE.MeshBasicMaterial({ color:0x00ff00});
+    var cubeMaterial2 = new THREE.MeshBasicMaterial({ color:0x00ff00, wireframe :true});
     var cube2 = new THREE.Mesh(cubeMeo2, cubeMaterial2);
-    cube2.position.x = 30;
-    scene.add(cube2);
-
-
+    cube2.position.x = 50;
+    group.add(cube2);
 
     //axishelper
     var axis = new THREE.AxisHelper(100);
     scene.add(axis);
 
+
+    camera.position.z = 200;
+    camera.position.x = 0;
+    camera.position.y = 0;
+    camera.up.x = 0;
+    camera.up.y = 1;
+    camera.up.z = 0;
+    camera.lookAt(cube.position);
+    camera.rotation.z = -Math.PI/2;
+
+
     var stats = new Stats();
     stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
     document.body.appendChild( stats.dom );
-
-    camera.position.z = 200;
-    camera.position.y = 100;
-   // camera.lookAt(new THREE.Vector3(0,0,0));
-    camera.lookAt(cube2.position);
-    camera.up.x = -1;
-    camera.up.y = 0;
-    camera.up.z = 0;
-
-
     function render(){
         stats.begin();
 
         //cube.rotation.x += .03;
-        //cube.rotation.z -= .03;
+        //cube.rotation.x += .03;
+        //camera.rotation.z += .03;
+        camera.lookAt(cube.position);
         renderer.render(scene, camera);
         stats.end();
 
         requestAnimationFrame(render);
     }
     render();
+    console.dir(camera);
 
 </script>
 </body>
