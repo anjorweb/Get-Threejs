@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>第二课</title>
+    <script src="build/three.js"></script>
+    <style>
+        * { margin:0; padding:0; }
+        html, body { height:100%; width:100%; overflow:hidden; }
+    </style>
+</head>
+<body>
+<script>
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
+
+    var renderer = new THREE.WebGLRenderer({
+        antialias:true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000);
+
+    var scene = new THREE.Scene();
+
+    //Texture
+    var texture = new THREE.TextureLoader().load("texture/1.jpg");
+    var plane = new THREE.PlaneGeometry(1024, 512);
+    var mesh  =new THREE.Mesh(plane, new THREE.MeshBasicMaterial({map:texture}));
+    scene.add(mesh);
+    console.dir(texture);
+
+
+    document.body.appendChild(renderer.domElement);
+
+
+    camera.position.z = 500;
+
+    function render(){
+        requestAnimationFrame(render);
+        renderer.render(scene, camera);
+    }
+    render();
+
+</script>
+</body>
+</html>

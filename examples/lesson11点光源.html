@@ -18,10 +18,10 @@
     if(box)*/
 
     //camera
-    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
     //var camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth/2, window.innerHeight/2, window.innerHeight/-2, 1, 1000);
-    camera.position.y = 200;
-    camera.position.z = 900;
+    var clock = new THREE.Clock();
+clock.start();
 
     var renderer = new THREE.WebGLRenderer({
         antialias:true
@@ -32,16 +32,42 @@
     var scene = new THREE.Scene();
 
     document.body.appendChild(renderer.domElement);
+    var cubeGroup = new THREE.Object3D();
 
-    var cubeMeo = new THREE.CubeGeometry(100, 100, 100);
-    var cubeMaterial = new THREE.MeshLambertMaterial({ color:0x0000ff});
+    var cubeMeo = new THREE.CubeGeometry(120, 150, 120);
+    var cubeMaterial = new THREE.MeshLambertMaterial({ color:0xff0000});
     var cube = new THREE.Mesh(cubeMeo, cubeMaterial);
-    scene.add(cube);
-    camera.lookAt(cube.position);
+    var cube2 = new THREE.Mesh(cubeMeo, cubeMaterial);
+    var cube3 = new THREE.Mesh(cubeMeo, cubeMaterial);
+    var cube4 = new THREE.Mesh(cubeMeo, cubeMaterial);
+    var cube5 = new THREE.Mesh(cubeMeo, cubeMaterial);
+    var cube6 = new THREE.Mesh(cubeMeo, cubeMaterial);
+    var cube7 = new THREE.Mesh(cubeMeo, cubeMaterial);
+    cube2.position.set(-250, 0, 0);
+    cube3.position.set(250, 0, 0);
+    cube4.position.set(0, -250, 0);
+    cube5.position.set(0, 250, 0);
+    cube6.position.set(0, 0, -250);
+    cube7.position.set(0, 0, 250);
+    cubeGroup.add(cube);
+    cubeGroup.add(cube2);
+    cubeGroup.add(cube3);
+    cubeGroup.add(cube4);
+    cubeGroup.add(cube5);
+    cubeGroup.add(cube6);
+    scene.add(cubeGroup);
+    camera.position.x = 400;
+    camera.position.z = 900;
+    camera.lookAt(new THREE.Vector3(0,0,0));
 
     //light
-    var light = new THREE.AmbientLight(0xffff55);
+    var light = new THREE.PointLight(0xff0000, 1, 1000, 0);
     scene.add(light);
+    scene.add(new THREE.PointLightHelper(light, 15));
+    light.position.z = 200;
+
+    var light2 = new THREE.AmbientLight(0x0000);
+    scene.add(light2);
     //dat.gui
     var parm;
     function ParmObj(){
@@ -58,10 +84,8 @@
 
     function render(){
         requestAnimationFrame(render);
-        cube.rotation.y += .03;
         setCameraFov();
-        //cube.rotation.x += .03;
-        //cube.rotation.z -= .03;
+        //light.position.y =  -Math.sin(time) * 200;
         renderer.render(scene, camera);
     }
     render();
