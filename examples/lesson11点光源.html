@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>第11课 点光源</title>
+    <script src="build/three.js"></script>
+    <script src="js/dat.gui.js"></script>
+    <style>
+        * { margin:0; padding:0; }
+        html, body { height:100%; width:100%; overflow:hidden; }
+    </style>
+</head>
+<body>
+<script>
+
+/*    var box = $("#box");
+    $("body").append('<div id="box"></div>');
+    if(box)*/
+
+    //camera
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+    //var camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth/2, window.innerHeight/2, window.innerHeight/-2, 1, 1000);
+    camera.position.y = 200;
+    camera.position.z = 900;
+
+    var renderer = new THREE.WebGLRenderer({
+        antialias:true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0xffffff);
+
+    var scene = new THREE.Scene();
+
+    document.body.appendChild(renderer.domElement);
+
+    var cubeMeo = new THREE.CubeGeometry(100, 100, 100);
+    var cubeMaterial = new THREE.MeshLambertMaterial({ color:0x0000ff});
+    var cube = new THREE.Mesh(cubeMeo, cubeMaterial);
+    scene.add(cube);
+    camera.lookAt(cube.position);
+
+    //light
+    var light = new THREE.AmbientLight(0xffff55);
+    scene.add(light);
+    //dat.gui
+    var parm;
+    function ParmObj(){
+        this.fov = 45;
+    }
+    parm = new ParmObj();
+    var gui = new dat.GUI();
+    gui.add(parm, "fov", 0, 180).name("视角大小");
+
+    function setCameraFov(){
+        camera.fov = parm.fov;
+        camera.updateProjectionMatrix();
+    }
+
+    function render(){
+        requestAnimationFrame(render);
+        cube.rotation.y += .03;
+        setCameraFov();
+        //cube.rotation.x += .03;
+        //cube.rotation.z -= .03;
+        renderer.render(scene, camera);
+    }
+    render();
+
+</script>
+</body>
+</html>
