@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>第14课</title>
+    <script src="build/three.js"></script>
+    <style>
+        * { margin:0; padding:0; }
+        html, body { height:100%; width:100%; overflow:hidden; }
+    </style>
+</head>
+<body>
+<script>
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
+
+    var renderer = new THREE.WebGLRenderer({
+        antialias:true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0xffffff);
+
+    var scene = new THREE.Scene();
+
+
+
+    var geometry = new THREE.Geometry();
+    var material = new THREE.MeshBasicMaterial({ vertexColors:THREE.VertexColors});
+
+    //vertexs
+    var p1 = new THREE.Vector3( -100, 0, 0 );
+    var p2 = new THREE.Vector3(  100, 0, 0 );
+    var p3 = new THREE.Vector3(  0, -100, 0 );
+
+    //colors
+    var color1 = new THREE.Color(0xff0000);
+    var color2 = new THREE.Color(0x00ff00);
+    var color3 = new THREE.Color(0x0000ff);
+
+    geometry.vertices.push(p1);
+    geometry.vertices.push(p2);
+    geometry.vertices.push(p3);
+
+    //geometry.colors.push( color1, color2, color1 );
+    var face = new THREE.Face3( 0, 1, 2 );
+
+    face.vertexColors[ 0 ] = color1;
+    face.vertexColors[ 1 ] = color2;
+    face.vertexColors[ 2 ] = color3;
+
+    geometry.faces.push(  face);
+
+    var mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+
+    document.body.appendChild(renderer.domElement);
+    camera.position.z = 400;
+
+    function render(){
+        requestAnimationFrame(render);
+        renderer.render(scene, camera);
+    }
+    render();
+
+</script>
+</body>
+</html>
