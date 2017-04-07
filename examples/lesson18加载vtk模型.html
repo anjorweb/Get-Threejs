@@ -33,7 +33,7 @@
     camera.position.y = 0;
 
     //light
-    var light = new THREE.DirectionalLight(0x008800);
+    var light = new THREE.DirectionalLight(0xffffff);
     light.position.x = -100;
     light.position.y = 100;
     light.position.z = 100;
@@ -51,7 +51,7 @@
         var geomotry = d;
         geomotry.computeVertexNormals();
         //var material = new THREE.MeshBasicMaterial({color:0xffffff});
-        var material = new THREE.MeshLambertMaterial({color:0x112233, side:THREE.FrontSide});
+        var material = new THREE.MeshLambertMaterial({color:0x660000, side:THREE.FrontSide});
         mesh = new THREE.Mesh(geomotry, material);
         mesh.scale.set(20,20,20);
         mesh.position.y = -2;
