@@ -24,12 +24,12 @@
 
 
     var geometry = new THREE.Geometry();
-    var material = new THREE.MeshBasicMaterial({ vertexColors:THREE.VertexColors});
+    var material = new THREE.MeshBasicMaterial({ vertexColors:THREE.VertexColors, side:THREE.DoubleSide});
 
     //vertexs
     var p1 = new THREE.Vector3( -100, 0, 0 );
     var p2 = new THREE.Vector3(  100, 0, 0 );
-    var p3 = new THREE.Vector3(  0, -100, 0 );
+    var p3 = new THREE.Vector3(  0, 100, 0 );
 
     //colors
     var color1 = new THREE.Color(0xff0000);
@@ -41,7 +41,7 @@
     geometry.vertices.push(p3);
 
     //geometry.colors.push( color1, color2, color1 );
-    var face = new THREE.Face3( 0, 1, 2 );
+    var face = new THREE.Face3( 0, 2, 1);// 0 2 1 绘制的就是反面， 0 1 2 绘制的正面，是否双面绘制需要设置材质的side:THREE.DoubleSide
 
     face.vertexColors[ 0 ] = color1;
     face.vertexColors[ 1 ] = color2;
@@ -56,6 +56,7 @@
     camera.position.z = 400;
 
     function render(){
+        mesh.rotation.y+=0.05;
         requestAnimationFrame(render);
         renderer.render(scene, camera);
     }

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>第18课</title>
+    <script src="build/three.js"></script>
+    <script src="js/stats.min.js"></script>
+    <script src="js/dat.gui.js"></script>
+    <script src="js/Detector.js"></script>
+    <script src="js/loader/VTKLoader.js"></script>
+    <style>
+        * { margin:0; padding:0; }
+    </style>
+</head>
+<body>
+<script>
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+
+    var renderer = new THREE.WebGLRenderer({
+        antialias:false
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000);
+
+    var scene = new THREE.Scene();
+
+    document.body.appendChild(renderer.domElement);
+
+    var group = new THREE.Object3D();
+    scene.add(group);
+    camera.position.z = 5;
+    camera.position.x = 0;
+    camera.position.y = 0;
+
+    //light
+    var light = new THREE.DirectionalLight(0x008800);
+    light.position.x = -100;
+    light.position.y = 100;
+    light.position.z = 100;
+    scene.add(light);
+    var light2 = new THREE.DirectionalLight(0xffffff);
+    light2.position.x = 100;
+    light2.position.y = 100;
+    light2.position.z = 100;
+    scene.add(light2);
+
+    //VTK
+    var mesh;
+    var vtkloaders = new THREE.VTKLoader();
+    vtkloaders.load("models/bunny.vtk", function(d){
+        var geomotry = d;
+        geomotry.computeVertexNormals();
+        //var material = new THREE.MeshBasicMaterial({color:0xffffff});
+        var material = new THREE.MeshLambertMaterial({color:0x0000ff, side:THREE.FrontSide});
+        mesh = new THREE.Mesh(geomotry, material);
+        mesh.scale.set(20,20,20);
+        mesh.position.y = -2;
+        console.dir(mesh);
+        scene.add(mesh);
+    }, function(per){
+        console.dir(parseInt(per.loaded/per.total)+"%");
+    });
+
+    var stats = new Stats();
+    stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+    document.body.appendChild( stats.dom );
+
+    function render(){
+        stats.begin();
+
+        if(mesh){
+            mesh.rotation.y+=0.03;
+        }
+        renderer.render(scene, camera);
+
+        stats.end();
+        requestAnimationFrame(render);
+    }
+    render();
+
+</script>
+</body>
+</html>
