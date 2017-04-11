@@ -18,9 +18,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function( text ) {
-
 			onLoad( scope.parse( text ) );
-
 		}, onProgress, onError );
 
 	},
