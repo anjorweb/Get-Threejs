@@ -8,3 +8,24 @@
 
 Javascript的Unit16Array、Float32Array等对象能够分配指定数目的整形或者浮点型数组，由他们分配的数组是线性的，连续的单元，所有CPU访问的速度极快无比。
 
+根据顶点算顶点的法线：
+
+```javascript
+var pA = new THREE.Vector3();
+var pB = new THREE.Vector3();
+var pC = new THREE.Vector3();
+
+var cb = new THREE.Vector3();
+var ab = new THREE.Vector3();
+
+pA.set( ax, ay, az ); 
+pB.set( bx, by, bz );
+pC.set( cx, cy, cz );
+
+cb.subVectors( pC, pB );  //设置向量pC - pB
+ab.subVectors( pA, pB );   //设置向量pA - pB
+cb.cross( ab );   //设置cb 和 ab的叉积
+
+cb.normalize();   //向量归一
+```
+

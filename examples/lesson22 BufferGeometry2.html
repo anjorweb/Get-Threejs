@@ -14,7 +14,7 @@
 <body>
 <script>
     if(!Detector.webgl) Detector.addGetWebGLMessage();
-    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
 
     var renderer = new THREE.WebGLRenderer({
         antialias:false
@@ -28,7 +28,7 @@
 
     var group = new THREE.Object3D();
     scene.add(group);
-    camera.position.z = 5;
+    camera.position.z = 1400;
     camera.position.x = 0;
     camera.position.y = 0;
 
@@ -48,12 +48,97 @@
     //BufferGeometry
     var group3D = new THREE.Object3D();
     var geometry = new THREE.BufferGeometry();
-    var triangles = 1600000;
+    var triangles = 100000;
 
     var positions = new Float32Array( triangles * 3 * 3);  //1600000个面，每个面需要3个顶点向量，每个向量需要3个分量
     var normals = new Float32Array( triangles * 3 * 3);  //每个顶点的法线
     var colors = new Float32Array(triangles * 3 * 3); //同上
 
+    var w = 800, w2 = w/2;
+    var d = 16, d2 = d/2;
+    var color = new THREE.Color();
+
+    var pointA = new THREE.Vector3();
+    var pointB = new THREE.Vector3();
+    var pointC = new THREE.Vector3();
+
+    var cb = new THREE.Vector3();
+    var ab = new THREE.Vector3();
+
+    for(var i=0; i<positions.length; i+=9){
+        var x = Math.random() * w - w2;
+        var y = Math.random() * w - w2;
+        var z = Math.random() * w - w2;
+
+        var ax = x + Math.random() * d - d2;
+        var ay = y + Math.random() * d - d2;
+        var az = z + Math.random() * d - d2;
+
+        var bx = x + Math.random() * d - d2;
+        var by = y + Math.random() * d - d2;
+        var bz = z + Math.random() * d - d2;
+
+        var cx = x + Math.random() * d - d2;
+        var cy = y + Math.random() * d - d2;
+        var cz = z + Math.random() * d - d2;
+
+        //position
+        positions[i  ] = ax;
+        positions[i+1] = ay;
+        positions[i+2] = az;
+        positions[i+3] = bx;
+        positions[i+4] = by;
+        positions[i+5] = bz;
+        positions[i+6] = cx;
+        positions[i+7] = cy;
+        positions[i+8] = cz;
+
+        //normals
+        pointA.set(ax, ay, az);
+        pointB.set(bx, by, bz);
+        pointC.set(cx, cy, cz);
+
+        cb.subVectors(pointC, pointB);
+        ab.subVectors(pointA, pointB);
+        cb.cross(ab);
+        cb.normalize();
+
+        normals[i  ] = cb.x;
+        normals[i+1] = cb.y;
+        normals[i+2] = cb.z;
+        normals[i+3] = cb.x;
+        normals[i+4] = cb.y;
+        normals[i+5] = cb.z;
+        normals[i+6] = cb.x;
+        normals[i+7] = cb.y;
+        normals[i+8] = cb.z;
+
+        var vx = x/w+0.5;
+        var vy = y/w+0.5;
+        var vz = z/w+0.5;
+
+        color.setRGB(vx, vy, vz);
+
+        colors[i  ] = color.r;
+        colors[i+1] = color.g;
+        colors[i+2] = color.b;
+        colors[i+3] = color.r;
+        colors[i+4] = color.g;
+        colors[i+5] = color.b;
+        colors[i+6] = color.r;
+        colors[i+7] = color.g;
+        colors[i+8] = color.b;
+    }
+    geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
+    geometry.addAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    var material = new THREE.MeshPhongMaterial({
+        side:THREE.DoubleSide, vertexColors: THREE.VertexColors
+    });
+
+    var mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
 
 
 
@@ -63,9 +148,16 @@
 
     function render(){
         stats.begin();
+		
+		if(mesh){
+			mesh.rotation.y += 0.02;
+			mesh.rotation.z += 0.02;
+		}
         renderer.render(scene, camera);
+		
+		requestAnimationFrame(render);
         stats.end();
-        requestAnimationFrame(render);
+        
     }
     render();
 
