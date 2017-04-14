@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>第21课 BufferGeometry</title>
+    <title>DEMO 加载json</title>
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
     <script src="build/three.js"></script>
     <script src="js/stats.min.js"></script>
     <script src="js/dat.gui.js"></script>
@@ -14,7 +15,7 @@
 <body>
 <script>
     if(!Detector.webgl) Detector.addGetWebGLMessage();
-    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
 
     var renderer = new THREE.WebGLRenderer({
         antialias:false
@@ -46,24 +47,12 @@
 
 
     //BufferGeometry
-
-    var geometry = new THREE.BufferGeometry();
-    var positionVertices = [
-        [-1.0,  1.0,  0],
-        [0,  -1.0,  0],
-        [1.0,  1.0,  0]
-    ];
-    var vertices = new Float32Array( positionVertices.length * 3);
-    for(var i=0; i<positionVertices.length; i++){
-        vertices[i*3 + 0 ] = positionVertices[i][0];
-        vertices[i*3 + 1 ] = positionVertices[i][1];
-        vertices[i*3 + 2 ] = positionVertices[i][2];
-    }
-    console.dir(new THREE.BufferAttribute(vertices, 3));
-    geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
-    var material = new THREE.MeshBasicMaterial( { color: 0xff0000, side:THREE.DoubleSide } );
-    var mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
+    var group3D = new THREE.Object3D();
+    //loader
+    $.get("models/zhuti.json", function(d){
+        console.dir(d.model.vertices[0].position);
+        console.dir(d.model);
+    }, 'json');
 
     var stats = new Stats();
     stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -71,12 +60,10 @@
 
     function render(){
         stats.begin();
+
         renderer.render(scene, camera);
-        if(mesh){
-            mesh.rotation.y -=0.05;
-        }
-        stats.end();
         requestAnimationFrame(render);
+        stats.end();
     }
     render();
 

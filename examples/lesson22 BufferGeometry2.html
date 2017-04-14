@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>第21课 BufferGeometry</title>
+    <title>第21课 BufferGeometry2 高性能篇</title>
     <script src="build/three.js"></script>
     <script src="js/stats.min.js"></script>
     <script src="js/dat.gui.js"></script>
@@ -46,24 +46,16 @@
 
 
     //BufferGeometry
-
+    var group3D = new THREE.Object3D();
     var geometry = new THREE.BufferGeometry();
-    var positionVertices = [
-        [-1.0,  1.0,  0],
-        [0,  -1.0,  0],
-        [1.0,  1.0,  0]
-    ];
-    var vertices = new Float32Array( positionVertices.length * 3);
-    for(var i=0; i<positionVertices.length; i++){
-        vertices[i*3 + 0 ] = positionVertices[i][0];
-        vertices[i*3 + 1 ] = positionVertices[i][1];
-        vertices[i*3 + 2 ] = positionVertices[i][2];
-    }
-    console.dir(new THREE.BufferAttribute(vertices, 3));
-    geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
-    var material = new THREE.MeshBasicMaterial( { color: 0xff0000, side:THREE.DoubleSide } );
-    var mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
+    var triangles = 1600000;
+
+    var positions = new Float32Array( triangles * 3 * 3);  //1600000个面，每个面需要3个顶点向量，每个向量需要3个分量
+    var normals = new Float32Array( triangles * 3 * 3);  //每个顶点的法线
+    var colors = new Float32Array(triangles * 3 * 3); //同上
+
+
+
 
     var stats = new Stats();
     stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -72,9 +64,6 @@
     function render(){
         stats.begin();
         renderer.render(scene, camera);
-        if(mesh){
-            mesh.rotation.y -=0.05;
-        }
         stats.end();
         requestAnimationFrame(render);
     }
