@@ -48,7 +48,7 @@
     //BufferGeometry
     var group3D = new THREE.Object3D();
     var geometry = new THREE.BufferGeometry();
-    var triangles = 100000;
+    var triangles = 150000;
 
     var positions = new Float32Array( triangles * 3 * 3);  //1600000个面，每个面需要3个顶点向量，每个向量需要3个分量
     var normals = new Float32Array( triangles * 3 * 3);  //每个顶点的法线
@@ -132,6 +132,8 @@
     geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
     geometry.addAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    geometry.computeBoundingSphere();//计算包围盒大小
 
     var material = new THREE.MeshPhongMaterial({
         side:THREE.DoubleSide, vertexColors: THREE.VertexColors
