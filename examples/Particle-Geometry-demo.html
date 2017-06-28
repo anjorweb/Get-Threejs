@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="telephone=no" name="format-detection">
+    <meta content="email=no" name="format-detection">
+    <title>粒子变换</title>
+    <style type="text/css">
+        * { margin:0; padding:0; }
+        html, body { height:100%; overflow: hidden;}
+        #webGL { height:100%; position: relative; }
+        #load { width:20%; line-height: 2; text-align: center; background: #666; position: absolute; left:0; top:0; z-index: 10; }
+    </style>
+</head>
+
+<body>
+<div id="load">
+    <p id="loadTxt">加载中...</p>
+</div>
+<div id="webGL"></div>
+<script type="text/javascript" src="build/three.js"></script>
+<script type="text/javascript" src="js/tween.js"></script>
+<!--效果器后期-->
+<script type="text/javascript" src="js/shaders/FilmShader.js"></script>
+<script type="text/javascript" src="js/shaders/CopyShader.js"></script>
+<script type="text/javascript" src="js/shaders/ConvolutionShader.js"></script>
+<script type="text/javascript" src="js/shaders/FocusShader.js"></script>
+
+<script type="text/javascript" src="js/postprocessing/EffectComposer.js"></script>
+<script type="text/javascript" src="js/postprocessing/BloomPass.js"></script>
+<script type="text/javascript" src="js/postprocessing/FilmPass.js"></script>
+<script type="text/javascript" src="js/postprocessing/RenderPass.js"></script>
+<script type="text/javascript" src="js/postprocessing/ShaderPass.js"></script>
+<script type="text/javascript" src="js/postprocessing/MaskPass.js"></script>
+
+<script type="text/javascript">
+    function trace(str) {
+        console.dir(str);
+    }
+    var camera, renderer, scene;
+    //创建渲染器
+    renderer = new THREE.WebGLRenderer({
+        antialias: true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.autoClear = false;  //定义渲染器是否应该在渲染之前自动清除其输出
+    document.getElementById("webGL").appendChild(renderer.domElement);
+
+    //创建场景
+    scene = new THREE.Scene();
+
+    //创建相机
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 1, 10000);
+    //雾化
+    scene.fog = new THREE.FogExp2(0x05050c, 0.000675);
+    renderer.setClearColor(scene.fog.color);
+    renderer.localClippingEnabled = true;
+    camera.lookAt({
+        x:0,
+        y:0,
+        z:0
+    });
+    camera.up.y = 1;
+    camera.position.z = 1900;
+    scene.add(camera);
+
+    var light = new THREE.AmbientLight(0xffffff);
+
+    var parent = new THREE.Object3D();
+
+    //mesh
+    var material = new THREE.PointsMaterial({ color:0xffffff});
+    var loader = new THREE.JSONLoader();
+
+    //模型网格列表
+    var jsonList = [
+        'models/kv/cpac5.json',
+        'models/kv/cpkv3.json',
+        'models/kv/cpmovie4.json',
+        'models/kv/cpgame3.json',
+        'models/kv/ye2.json'
+    ];
+    var geometryList = [];
+    var curJsonId = 0,
+        bufferShowGeometry,
+        bufferVertices,
+        animGeometry, //一个显示的geometry
+        animMesh,  //一个显示的
+        nextAnimId = 0,  // 要播放到的模型id
+        nextAnimGeometry;  //下一个网格
+    var bgPointsMesh1, bgPointsMesh2;
+
+    //定义这5个模型旋转弧度
+    var geoListRotateX = [0, -Math.PI / 1.5, -Math.PI / 2, -Math.PI / 2, 0];
+    loadModelItem();
+    //模型加载方法
+    function loadModelItem(){
+        if (curJsonId > (jsonList.length -1)){
+            trace("加载完成");
+            //初始化数据
+            document.getElementById("loadTxt").style.display = "none";
+            initAll();
+            return;
+        }
+        loader.load(jsonList[curJsonId], function(geometry){
+            geometry.normalize();
+            geometryList[curJsonId] = geometry;
+            geometry.rotateX(geoListRotateX[curJsonId]);
+            curJsonId++;
+
+            loadModelItem();
+        });
+    }
+
+    function initAll() {
+        var tpmArr = [];
+        //需要取得这一组模型里，定点数最多的模型
+        for (var i=0; i<geometryList.length; i++){
+            tpmArr[i] = geometryList[i].vertices.length;
+        }
+        //取最大值
+        var maxI = tpmArr.indexOf(Math.min.apply(null, tpmArr));
+        var maxGeometry = geometryList[maxI-1];
+        //定义一个显示的模型，刚刚加载的5个模型只为了得到顶点坐标，不参与显示变换
+        animGeometry = new THREE.Geometry();
+        //创建两个背景粒子
+        var bgGeo1 = new THREE.Geometry();
+        var bgGeo2 = new THREE.Geometry();
+        //先给显示的模型设置一个随机顶点，各个点随机分布整个场景
+        for (var i=0; i<maxGeometry.vertices.length; i++){
+            //animGeometry.vertices[i] = new THREE.Vector3(maxGeometry.vertices[i].x, maxGeometry.vertices[i].y, maxGeometry.vertices[i].z);
+            var rdm = 4 * Math.random() -2;
+            var rdm2 = 4 * Math.random() -2;
+            animGeometry.vertices[i] = new THREE.Vector3(4 * Math.random() -2,4 * Math.random() -2,4 * Math.random() -2);
+            if (i<300){
+                bgGeo1.vertices[i] = new THREE.Vector3(4 * Math.random() -2,4 * Math.random() -2,4 * Math.random() -2);
+                bgGeo2.vertices[i] = new THREE.Vector3(4 * Math.random() -2,4 * Math.random() -2,4 * Math.random() -2);
+            }
+        }
+        //加载小粒子纹理
+        var texture = new THREE.TextureLoader();
+        texture.crossOrigin="";
+        texture.load("texture/gradient.png", function(res){
+            var pointsMater = new THREE.PointsMaterial({
+                size: 7,
+                map: res,
+                //color:0x00ff00,
+                blending: THREE.AdditiveBlending,
+                depthTest: !0,
+                fog:true,
+                alphaTest: .1,
+                opacity: 1,
+                transparent: !0,
+                //vertexColors: THREE.VertexColors
+            });
+
+            //增加背景氛围的小粒子
+            bgPointsMesh1 = new THREE.Points(bgGeo1, pointsMater);
+            bgPointsMesh2 = new THREE.Points(bgGeo2, pointsMater);
+
+            scene.add(bgPointsMesh1);
+            bgPointsMesh1.scale.set(500, 500, 500);
+            scene.add(bgPointsMesh2);
+            bgPointsMesh1.scale.set(500, 500, 500);
+
+            //构建显示的网格
+            animMesh = new THREE.Points(animGeometry, pointsMater);
+            animMesh.scale.set(500, 500, 500);
+            parent.add(animMesh);
+
+            //创建一个球体
+/*            var spGeometry = new THREE.SphereBufferGeometry(550, 20, 20);
+            var spMaterial = new THREE.MeshBasicMaterial( {color: 0xffffff, wireframe:true} );
+            var sphere = new THREE.Mesh( spGeometry, spMaterial );
+            scene.add(sphere);*/
+
+            //隔4秒自动切换
+            setInterval(function(){
+                if (nextAnimId > geometryList.length -1){
+                    nextAnimId = 0;
+                }
+                nextAnimGeometry = geometryList[nextAnimId];
+                changeStageAnim();
+                nextAnimId++;
+            }, 4000);
+        });
+        setEff();
+    }
+    function changeStageAnim() {
+        //动画
+        //animGeometry
+        //nextAnimGeometry
+        //给动画粒子添加动画
+        animGeometry.vertices.forEach(function (obj, _index) {
+           // var obj  = animGeometry.vertices[_index];
+            if (!obj.tweenvtx){
+                obj.tweenvtx = new TWEEN.Tween(obj).easing(TWEEN.Easing.Quadratic.In).onUpdate(function(e){ }).onComplete(function() {
+                    obj.tweenvtx.isplaying = !1
+                });
+            }
+            // to 到一个坐标，溢出的坐标从头开始
+            obj.tweenvtx.to({
+                x:nextAnimGeometry.vertices[_index] ? nextAnimGeometry.vertices[_index].x : nextAnimGeometry.vertices[animGeometry.vertices.length-_index].x,
+                y:nextAnimGeometry.vertices[_index] ? nextAnimGeometry.vertices[_index].y : nextAnimGeometry.vertices[animGeometry.vertices.length-_index].y,
+                z:nextAnimGeometry.vertices[_index] ? nextAnimGeometry.vertices[_index].z : nextAnimGeometry.vertices[animGeometry.vertices.length-_index].z
+            }).delay(1500*Math.random());
+            obj.tweenvtx.start();
+        });
+    }
+    function _(e, t) {
+        return Math.random() * (t - e) + e
+    }
+
+    var axes = new THREE.AxisHelper(100);
+
+    var grid = new THREE.Points(new THREE.PlaneBufferGeometry(15000, 15000, 64, 64), new THREE.PointsMaterial({
+        color: 0xff0000,
+        size: 5
+    }));
+    grid.position.y = -400;
+    grid.rotation.x = -Math.PI / 2;
+    scene.add(grid);
+
+    parent.add(axes);
+    scene.add(light);
+    scene.add(parent);
+    var effecter,effectFocus;
+
+    // 添加一些效果器，参与后期处理
+     function setEff() {
+         var renderModel = new THREE.RenderPass(scene, camera);
+         var effectBloom = new THREE.BloomPass(.75);
+         var effectFilm = new THREE.FilmPass(0.5, 0.5, 1500, !1);
+         //var Maskpass = new THREE.MaskPass(scene, camera);
+         effectFocus = new THREE.ShaderPass(THREE.FocusShader);
+         effectFocus.uniforms["screenWidth"].value = window.innerWidth;
+         effectFocus.uniforms["screenHeight"].value = window.innerHeight;
+
+         effectFocus.renderToScreen = true;
+
+         effecter = new THREE.EffectComposer(renderer);
+         effecter.addPass(renderModel);
+         effecter.addPass(effectBloom);
+         effecter.addPass(effectFilm);
+         effecter.addPass(effectFocus);
+     }
+    window.addEventListener('resize', onWindowResize, false);
+    function onWindowResize(event) {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        camera.lookAt(scene.position);
+        effecter.reset();
+
+        effectFocus.uniforms["screenWidth"].value = window.innerWidth;
+        effectFocus.uniforms["screenHeight"].value = window.innerHeight;
+
+    }
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+    function animate(time) {
+        parent.rotation.y += 0.005;
+        //parent.rotation.x += 0.005;
+        if (animMesh){
+            animGeometry.verticesNeedUpdate = true;
+            TWEEN.update(time);
+            bgPointsMesh1.rotation.x -=0.001;
+            bgPointsMesh1.rotation.z +=0.001;
+            bgPointsMesh2.rotation.x +=0.001;
+            bgPointsMesh2.rotation.z -=0.002;
+        }
+        //setEff();
+        if (effecter){
+            renderer.clear( false, true, false );
+            //效果器渲染，不使用 renderer渲染
+            effecter.render(0.1);
+        }
+        //renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+    }
+
+</script>
+</body>
+
+</html>
